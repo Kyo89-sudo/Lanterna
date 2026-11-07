@@ -52,6 +52,7 @@ class PlayerActivity : AppCompatActivity() {
     private var lastBytes = 0L
     private var lastTime = 0L
     private var rebuffers = 0
+    private var lastRebufferAt = ""
 
     private val hideOsd = Runnable { osd.visibility = View.GONE }
 
@@ -157,10 +158,25 @@ class PlayerActivity : AppCompatActivity() {
 
         p.addListener(object : Player.Listener {
             private var wasReady = false
+            private var seeking = false
+
+            // I salti (±10 s, barra) mettono il player in caricamento: non sono rebuffering.
+            override fun onPositionDiscontinuity(
+                oldPosition: Player.PositionInfo, newPosition: Player.PositionInfo, reason: Int
+            ) {
+                if (reason == Player.DISCONTINUITY_REASON_SEEK) seeking = true
+            }
+
             override fun onPlaybackStateChanged(state: Int) {
                 when (state) {
-                    Player.STATE_READY -> wasReady = true
-                    Player.STATE_BUFFERING -> if (wasReady) rebuffers++
+                    Player.STATE_READY -> {
+                        wasReady = true
+                        seeking = false
+                    }
+                    Player.STATE_BUFFERING -> if (wasReady && !seeking) {
+                        rebuffers++
+                        lastRebufferAt = formatTime(player.currentPosition)
+                    }
                     Player.STATE_ENDED -> {
                         Store.setResume(uriKey, 0)
                         finish()
@@ -277,6 +293,7 @@ class PlayerActivity : AppCompatActivity() {
             append("Read-ahead SMB:   $ahead MB  (max ${preset.readAheadMb} MB)\n")
             append("Lettura SMB ora:  %.1f Mbps\n".format(mbps))
             append("Rebuffering:      $rebuffers")
+            if (lastRebufferAt.isNotEmpty()) append("  (ultimo a $lastRebufferAt)")
         }
     }
 
