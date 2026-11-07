@@ -23,7 +23,8 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_list)
         findViewById<TextView>(R.id.header).text = getString(R.string.app_name)
-        findViewById<TextView>(R.id.path).text = "Server SMB"
+        findViewById<TextView>(R.id.path).text = "Server SMB  ·  build " +
+            packageManager.getPackageInfo(packageName, 0).versionName
         findViewById<View>(R.id.empty).visibility = View.GONE
         recycler = findViewById(R.id.list)
         recycler.layoutManager = LinearLayoutManager(this)

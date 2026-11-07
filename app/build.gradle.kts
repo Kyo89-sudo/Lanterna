@@ -11,8 +11,10 @@ android {
         applicationId = "com.kyo.lanterna"
         minSdk = 25
         targetSdk = 34
-        versionCode = 1
-        versionName = "0.1.0"
+        // Numero di build di GitHub Actions: versione crescente e visibile nell'app
+        val build = (System.getenv("GITHUB_RUN_NUMBER") ?: "0").toInt()
+        versionCode = 100 + build
+        versionName = "0.1.$build"
     }
 
     // Chiave fissa: ogni build (PC o GitHub) ha la stessa firma,
