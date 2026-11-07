@@ -66,16 +66,24 @@ class Prefetcher(
     private fun readChunk(off: Long, len: Int): ByteArray {
         val buf = ByteArray(len)
         var done = 0
+        var emptyReads = 0
         while (done < len) {
             if (closed) throw InterruptedIOException("chiuso")
             // richieste da max 512 KB: dopo un salto le letture vecchie si fermano subito
             val n = file.read(buf, off + done, done, minOf(len - done, 512 * 1024))
-            if (n <= 0) break
+            if (n <= 0) {
+                // Il blocco sta tutto dentro il file: una risposta vuota non è la fine del file.
+                // Riprova lo stesso punto; mai restituire un blocco con un buco in mezzo.
+                if (++emptyReads >= 5) throw IOException("lettura SMB incompleta a ${off + done}")
+                Thread.sleep(100L * emptyReads)
+                continue
+            }
+            emptyReads = 0
             done += n
         }
         SmbStats.bytesRead.addAndGet(done.toLong())
         if (!closed) ahead.addAndGet(done.toLong())
-        return if (done == len) buf else buf.copyOf(done)
+        return buf
     }
 
     /** Ritorna i byte copiati, oppure -1 a fine file. */
