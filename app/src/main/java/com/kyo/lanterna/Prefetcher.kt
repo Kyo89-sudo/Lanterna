@@ -49,10 +49,15 @@ class Prefetcher(
         fill()
     }
 
+    // Avvio rapido: i primi blocchi sono piccoli (256 KB) e raddoppiano fino a chunkSize,
+    // così dopo un'apertura o un salto il player riceve dati in pochi decimi di secondo.
+    private var nextLen = minOf(256 * 1024, chunkSize)
+
     private fun fill() {
         while (!closed && pending.size < maxChunks && nextOffset < end) {
             val off = nextOffset
-            val len = minOf(chunkSize.toLong(), end - off).toInt()
+            val len = minOf(nextLen.toLong(), end - off).toInt()
+            nextLen = minOf(nextLen * 2, chunkSize)
             nextOffset += len
             pending.addLast(pool.submit(Callable { readChunk(off, len) }))
         }
@@ -63,7 +68,8 @@ class Prefetcher(
         var done = 0
         while (done < len) {
             if (closed) throw InterruptedIOException("chiuso")
-            val n = file.read(buf, off + done, done, len - done)
+            // richieste da max 512 KB: dopo un salto le letture vecchie si fermano subito
+            val n = file.read(buf, off + done, done, minOf(len - done, 512 * 1024))
             if (n <= 0) break
             done += n
         }
