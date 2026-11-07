@@ -155,7 +155,7 @@ class BrowseActivity : AppCompatActivity() {
                 val f = SmbManager.openFile(server, e.path)
                 val size = f.getFileInformation(FileStandardInformation::class.java).endOfFile
                 val len = minOf(size, 512L * 1024 * 1024)
-                val p = Prefetcher(f, 0, len, Prefetcher.CHUNK, 16, SmbManager.pool)
+                val p = Prefetcher({ b, o, bo, l -> f.read(b, o, bo, l) }, 0, len, Prefetcher.CHUNK, 16, SmbManager.pool)
                 val buf = ByteArray(256 * 1024)
                 var total = 0L
                 val t0 = SystemClock.elapsedRealtime()

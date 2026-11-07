@@ -1,6 +1,5 @@
 package com.kyo.lanterna
 
-import com.hierynomus.smbj.share.File
 import java.io.Closeable
 import java.io.IOException
 import java.io.InterruptedIOException
@@ -21,8 +20,13 @@ object SmbStats {
  * Il player chiede pochi KB alla volta: invece di fare una richiesta di rete
  * per ognuna, li prende dalla RAM. La rete lavora sempre "davanti" al player.
  */
+/** Legge `length` byte dal file a `fileOffset` dentro `buf` da `bufOffset`; ritorna i byte letti o -1. */
+fun interface ChunkReader {
+    fun read(buf: ByteArray, fileOffset: Long, bufOffset: Int, length: Int): Int
+}
+
 class Prefetcher(
-    private val file: File,
+    private val file: ChunkReader,
     start: Long,
     length: Long,
     private val chunkSize: Int,
