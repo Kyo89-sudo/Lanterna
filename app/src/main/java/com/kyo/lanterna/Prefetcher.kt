@@ -44,19 +44,21 @@ class Prefetcher(
     private val ahead = AtomicLong()
     @Volatile private var closed = false
 
+    // Avvio rapido: i primi blocchi sono piccoli (256 KB) e raddoppiano fino a chunkSize,
+    // così dopo un'apertura o un salto il player riceve dati in pochi decimi di secondo.
+    // NB: va dichiarato PRIMA del blocco init, che chiama fill().
+    private var nextLen = minOf(256 * 1024, chunkSize).coerceAtLeast(64 * 1024)
+
     init {
         active.add(this)
         fill()
     }
 
-    // Avvio rapido: i primi blocchi sono piccoli (256 KB) e raddoppiano fino a chunkSize,
-    // così dopo un'apertura o un salto il player riceve dati in pochi decimi di secondo.
-    private var nextLen = minOf(256 * 1024, chunkSize)
-
     private fun fill() {
         while (!closed && pending.size < maxChunks && nextOffset < end) {
             val off = nextOffset
             val len = minOf(nextLen.toLong(), end - off).toInt()
+            if (len <= 0) break
             nextLen = minOf(nextLen * 2, chunkSize)
             nextOffset += len
             pending.addLast(pool.submit(Callable { readChunk(off, len) }))
