@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="20dp">
+
+        <EditText
+            android:id="@+id/f_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Nome (es. NAS soggiorno)"
+            android:importantForAutofill="no"
+            android:inputType="text"
+            android:singleLine="true" />
+
+        <EditText
+            android:id="@+id/f_host"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Indirizzo IP o nome (es. 192.168.1.10)"
+            android:importantForAutofill="no"
+            android:inputType="textUri"
+            android:singleLine="true" />
+
+        <EditText
+            android:id="@+id/f_share"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Cartella condivisa (es. Film)"
+            android:importantForAutofill="no"
+            android:inputType="text"
+            android:singleLine="true" />
+
+        <EditText
+            android:id="@+id/f_user"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Nome utente"
+            android:importantForAutofill="no"
+            android:inputType="text"
+            android:singleLine="true" />
+
+        <EditText
+            android:id="@+id/f_pass"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Password"
+            android:importantForAutofill="no"
+            android:inputType="textPassword"
+            android:singleLine="true" />
+
+        <EditText
+            android:id="@+id/f_domain"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Dominio (di solito vuoto)"
+            android:importantForAutofill="no"
+            android:inputType="text"
+            android:singleLine="true" />
+    </LinearLayout>
+</ScrollView>
