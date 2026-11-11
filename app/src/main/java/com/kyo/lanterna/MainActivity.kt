@@ -1,5 +1,6 @@
 package com.kyo.lanterna
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
@@ -15,6 +16,10 @@ import java.util.concurrent.Executors
 
 /** Base comune: applica il tema (chiaro / scuro / automatico). */
 abstract class BaseActivity : AppCompatActivity() {
+    override fun attachBaseContext(newBase: Context) {
+        super.attachBaseContext(TvScale.wrap(newBase))
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         Store.init(this)
         Themes.apply()

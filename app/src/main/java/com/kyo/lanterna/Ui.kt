@@ -1,6 +1,9 @@
 package com.kyo.lanterna
 
+import android.content.Context
 import android.content.res.ColorStateList
+import android.content.res.Configuration
+import android.util.DisplayMetrics
 import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
@@ -10,6 +13,30 @@ import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
+
+/**
+ * L'interfaccia è disegnata per uno schermo largo 1280 dp; la Fire TV ne usa 960.
+ * Si adatta la densità così che ogni schermo TV (720p, 1080p, 4K) mostri tutto senza tagli.
+ */
+object TvScale {
+    private const val DESIGN_WIDTH_DP = 1280
+
+    fun wrap(base: Context): Context {
+        val res = base.resources
+        val dm = res.displayMetrics
+        val widthPx = maxOf(dm.widthPixels, dm.heightPixels)
+        val heightPx = minOf(dm.widthPixels, dm.heightPixels)
+        if (widthPx <= 0) return base
+        val dpi = widthPx * DisplayMetrics.DENSITY_DEFAULT / DESIGN_WIDTH_DP
+        val cfg = Configuration(res.configuration)
+        if (dpi <= 0 || cfg.densityDpi == dpi) return base
+        cfg.densityDpi = dpi
+        cfg.screenWidthDp = widthPx * DisplayMetrics.DENSITY_DEFAULT / dpi
+        cfg.screenHeightDp = heightPx * DisplayMetrics.DENSITY_DEFAULT / dpi
+        cfg.smallestScreenWidthDp = cfg.screenHeightDp
+        return base.createConfigurationContext(cfg)
+    }
+}
 
 private fun View.focusScale(scale: Float) {
     setOnFocusChangeListener { v, f ->

@@ -1,5 +1,6 @@
 package com.kyo.lanterna
 
+import android.content.Context
 import android.graphics.Color
 import android.graphics.Typeface
 import android.net.Uri
@@ -132,6 +133,10 @@ class PlayerActivity : AppCompatActivity() {
     private var lastRebufferAt = ""
 
     // ---------------- avvio ----------------
+
+    override fun attachBaseContext(newBase: Context) {
+        super.attachBaseContext(TvScale.wrap(newBase))
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         Store.init(this)
