@@ -14,7 +14,7 @@ android {
         // Numero di build di GitHub Actions: versione crescente e visibile nell'app
         val build = (System.getenv("GITHUB_RUN_NUMBER") ?: "0").toInt()
         versionCode = 100 + build
-        versionName = "0.1.$build"
+        versionName = "0.2.$build"
     }
 
     // Chiave fissa: ogni build (PC o GitHub) ha la stessa firma,

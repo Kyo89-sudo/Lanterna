@@ -3,6 +3,7 @@ package com.kyo.lanterna
 import android.net.Uri
 import com.hierynomus.msdtyp.AccessMask
 import com.hierynomus.msfscc.FileAttributes
+import com.hierynomus.msfscc.fileinformation.FileStandardInformation
 import com.hierynomus.mssmb2.SMB2CreateDisposition
 import com.hierynomus.mssmb2.SMB2ShareAccess
 import com.hierynomus.security.bc.BCSecurityProvider
@@ -15,6 +16,7 @@ import java.io.IOException
 import java.util.EnumSet
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
+import java.util.concurrent.Semaphore
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicInteger
 
@@ -44,10 +46,24 @@ object SmbUri {
 object SmbManager {
 
     /** Thread che leggono i blocchi in parallelo (più richieste SMB in volo = meno attese). */
-    val pool: ExecutorService = Executors.newFixedThreadPool(4, object : java.util.concurrent.ThreadFactory {
+    val pool: ExecutorService = Executors.newFixedThreadPool(8, object : java.util.concurrent.ThreadFactory {
         private val n = AtomicInteger()
         override fun newThread(r: Runnable) = Thread(r, "smb-read-${n.incrementAndGet()}").apply { isDaemon = true }
     })
+
+    /** Limita le letture contemporanee al valore scelto nelle impostazioni (2/4/6/8). */
+    @Volatile private var limiterSize = 0
+    @Volatile private var limiterSem = Semaphore(4)
+
+    @Synchronized
+    fun limiter(): Semaphore {
+        val n = Store.parallel
+        if (n != limiterSize) {
+            limiterSem = Semaphore(n)
+            limiterSize = n
+        }
+        return limiterSem
+    }
 
     private val client: SMBClient by lazy {
         SMBClient(
@@ -121,4 +137,6 @@ object SmbManager {
             null
         )
     }
+
+    fun fileSize(f: File): Long = f.getFileInformation(FileStandardInformation::class.java).endOfFile
 }

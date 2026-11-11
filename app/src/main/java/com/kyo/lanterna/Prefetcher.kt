@@ -8,6 +8,7 @@ import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.ExecutionException
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Future
+import java.util.concurrent.Semaphore
 import java.util.concurrent.atomic.AtomicLong
 
 object SmbStats {
@@ -31,7 +32,8 @@ class Prefetcher(
     length: Long,
     private val chunkSize: Int,
     private val maxChunks: Int,
-    private val pool: ExecutorService
+    private val pool: ExecutorService,
+    private val limiter: Semaphore? = null
 ) : Closeable {
 
     companion object {
@@ -73,6 +75,8 @@ class Prefetcher(
         val buf = ByteArray(len)
         var done = 0
         var emptyReads = 0
+        limiter?.acquireUninterruptibly()
+        try {
         while (done < len) {
             if (closed) throw InterruptedIOException("chiuso")
             // richieste da max 512 KB: dopo un salto le letture vecchie si fermano subito
@@ -86,6 +90,9 @@ class Prefetcher(
             }
             emptyReads = 0
             done += n
+        }
+        } finally {
+            limiter?.release()
         }
         SmbStats.bytesRead.addAndGet(done.toLong())
         if (!closed) ahead.addAndGet(done.toLong())

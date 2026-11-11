@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- tema scuro -->
+    <color name="bg">#FF161618</color>
+    <color name="sidebar">#FF232326</color>
+    <color name="surface">#FF232326</color>
+    <color name="surface2">#FF2C2C30</color>
+    <color name="text">#FFF5F5F7</color>
+    <color name="text_dim">#FFA1A1A6</color>
+    <color name="accent">#FF0A84FF</color>
+    <color name="focus_bg">#FF243A66</color>
+    <color name="divider">#FF2E2E32</color>
+    <color name="progress_track">#33FFFFFF</color>
+    <color name="icon_box">#FF2F3A4F</color>
+    <color name="card_border">#FF3A3A3F</color>
+</resources>

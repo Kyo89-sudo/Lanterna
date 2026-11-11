@@ -55,7 +55,7 @@ class SmbDataSource : BaseDataSource(/* isNetwork = */ true) {
 
         val preset = Store.bufferPreset()
         val chunks = ((preset.readAheadMb.toLong() * 1024 * 1024) / Prefetcher.CHUNK).toInt().coerceAtLeast(2)
-        prefetcher = Prefetcher({ b, o, bo, l -> f.read(b, o, bo, l) }, dataSpec.position, bytesRemaining, Prefetcher.CHUNK, chunks, SmbManager.pool)
+        prefetcher = Prefetcher({ b, o, bo, l -> f.read(b, o, bo, l) }, dataSpec.position, bytesRemaining, Prefetcher.CHUNK, chunks, SmbManager.pool, SmbManager.limiter())
 
         opened = true
         transferStarted(dataSpec)

@@ -6,13 +6,11 @@ import android.os.SystemClock
 import android.view.View
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.hierynomus.msfscc.fileinformation.FileStandardInformation
 import java.util.concurrent.Executors
 
-class BrowseActivity : AppCompatActivity() {
+class BrowseActivity : BaseActivity() {
 
     companion object {
         const val EXTRA_SERVER = "server"
@@ -33,10 +31,10 @@ class BrowseActivity : AppCompatActivity() {
         server = Store.server(intent.getStringExtra(EXTRA_SERVER) ?: "") ?: run { finish(); return }
         path = intent.getStringExtra(EXTRA_PATH) ?: ""
 
-        findViewById<TextView>(R.id.header).text =
-            if (path.isEmpty()) server.name.ifBlank { server.host } else path.substringAfterLast('/')
+        val serverName = server.name.ifBlank { server.host }
+        findViewById<TextView>(R.id.header).text = if (path.isEmpty()) serverName else path.substringAfterLast('/')
         findViewById<TextView>(R.id.path).text =
-            "\\\\${server.host}\\${server.share}\\" + path.replace('/', '\\')
+            (listOf(serverName) + path.split('/').filter { it.isNotEmpty() }).joinToString("  ›  ")
 
         empty = findViewById(R.id.empty)
         empty.setOnClickListener { load() }
@@ -48,7 +46,7 @@ class BrowseActivity : AppCompatActivity() {
 
     override fun onRestart() {
         super.onRestart()
-        // aggiorna le indicazioni "ripresa da" dopo aver guardato un video
+        // aggiorna "visto" e "ripresa da" dopo aver guardato un video
         if (entries.isNotEmpty()) show(entries, focusFirst = false)
     }
 
@@ -75,12 +73,25 @@ class BrowseActivity : AppCompatActivity() {
         entries = all
         val dirs = all.filter { it.isDir }
         val videos = all.filter { !it.isDir && it.ext in VIDEO_EXT }
-        adapter.rows = dirs.map { Row(it.name, "", "📁", it) } + videos.map { v ->
-            val r = Store.resume(key(v))
-            val extra = if (r > 0) "  ·  ripresa da ${formatTime(r)}" else ""
-            val subs = if (sidecarSubs(v).isNotEmpty()) "  ·  sottotitoli esterni" else ""
-            Row(v.name, formatSize(v.size) + subs + extra, if (r > 0) "◐" else "▶", v)
-        }
+        adapter.rows = dirs.map { Row(it.name, "Cartella", R.drawable.ic_folder, it, accent = true) } +
+            videos.map { v ->
+                val key = key(v)
+                val r = Store.resume(key)
+                val d = Store.duration(key)
+                val w = Store.watched(key)
+                val parts = mutableListOf(formatSize(v.size))
+                if (sidecarSubs(v).isNotEmpty()) parts.add("sottotitoli esterni")
+                if (w) parts.add("visto")
+                if (r > 0) parts.add("ripresa da ${formatTime(r)}")
+                Row(
+                    title = v.name.substringBeforeLast('.'),
+                    subtitle = parts.joinToString("  ·  "),
+                    icon = R.drawable.ic_video,
+                    tag = v,
+                    progress = if (r > 0 && d > 0) (r * 100 / d).toInt() else -1,
+                    watched = w
+                )
+            }
         if (adapter.rows.isEmpty()) {
             empty.text = "Nessuna cartella o video qui"
             empty.visibility = View.VISIBLE
@@ -121,41 +132,54 @@ class BrowseActivity : AppCompatActivity() {
     private fun onOptions(row: Row) {
         val e = row.tag as? SmbEntry ?: return
         if (e.isDir) return
+        val k = key(e)
+        val watched = Store.watched(k)
         AlertDialog.Builder(this)
             .setTitle(e.name)
-            .setItems(arrayOf("Riproduci dall'inizio", "Test velocità SMB su questo file")) { _, which ->
-                if (which == 0) play(e, 0L) else speedTest(e)
+            .setItems(
+                arrayOf(
+                    "Riproduci dall'inizio",
+                    if (watched) "Segna come non visto" else "Segna come visto",
+                    "Test velocità SMB su questo file"
+                )
+            ) { _, which ->
+                when (which) {
+                    0 -> play(e, 0L)
+                    1 -> {
+                        Store.setWatched(k, !watched)
+                        if (!watched) Store.clearProgress(k)
+                        show(entries, focusFirst = false)
+                    }
+                    2 -> speedTest(e)
+                }
             }
             .show()
     }
 
     private fun play(e: SmbEntry, start: Long) {
-        val base = e.name.substringBeforeLast('.')
-        val subs = sidecarSubs(e)
         startActivity(
             Intent(this, PlayerActivity::class.java)
                 .putExtra(PlayerActivity.EXTRA_URI, key(e))
                 .putExtra(PlayerActivity.EXTRA_TITLE, e.name)
                 .putExtra(PlayerActivity.EXTRA_START, start)
-                .putStringArrayListExtra(PlayerActivity.EXTRA_SUB_URIS, ArrayList(subs.map { key(it) }))
-                .putStringArrayListExtra(PlayerActivity.EXTRA_SUB_LABELS, ArrayList(subs.map {
-                    it.name.substring(minOf(base.length, it.name.length)).substringBeforeLast('.').trim('.', ' ', '_', '-')
-                }))
         )
     }
 
     private fun speedTest(e: SmbEntry) {
         val dlg = AlertDialog.Builder(this)
             .setTitle("Test velocità SMB")
-            .setMessage("Lettura in corso (max 15 secondi)…")
+            .setMessage("Lettura in corso con ${Store.parallel} connessioni (max 15 secondi)…")
             .setNegativeButton("Chiudi", null)
             .show()
         io.execute {
             val msg = try {
                 val f = SmbManager.openFile(server, e.path)
-                val size = f.getFileInformation(FileStandardInformation::class.java).endOfFile
+                val size = SmbManager.fileSize(f)
                 val len = minOf(size, 512L * 1024 * 1024)
-                val p = Prefetcher({ b, o, bo, l -> f.read(b, o, bo, l) }, 0, len, Prefetcher.CHUNK, 16, SmbManager.pool)
+                val p = Prefetcher(
+                    { b, o, bo, l -> f.read(b, o, bo, l) }, 0, len, Prefetcher.CHUNK, 16,
+                    SmbManager.pool, SmbManager.limiter()
+                )
                 val buf = ByteArray(256 * 1024)
                 var total = 0L
                 val t0 = SystemClock.elapsedRealtime()
@@ -168,8 +192,9 @@ class BrowseActivity : AppCompatActivity() {
                 p.close()
                 runCatching { f.close() }
                 val mbps = total * 8 / 1_000_000.0 / sec
-                "Letti ${formatSize(total)} in %.1f s\n\nVelocità: %.1f Mbps\n\n".format(sec, mbps) +
-                    "Riferimento: 1080p H.265/AV1 ≈ 3–15 Mbps, 4K remux ≈ 40–100 Mbps."
+                "Letti ${formatSize(total)} in %.1f s con ${Store.parallel} connessioni\n\nVelocità: %.1f Mbps\n\n".format(sec, mbps) +
+                    "Riferimento: 1080p WEB ≈ 3–10 Mbps, 4K WEB ≈ 15–25 Mbps.\n" +
+                    "Prova a cambiare le letture parallele in Impostazioni e ripeti il test."
             } catch (ex: Exception) {
                 "Errore: ${ex.message ?: ex.javaClass.simpleName}"
             }

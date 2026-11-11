@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/bg"
+    android:orientation="horizontal">
+
+    <LinearLayout
+        android:id="@+id/nav"
+        android:layout_width="248dp"
+        android:layout_height="match_parent"
+        android:background="@color/sidebar"
+        android:orientation="vertical"
+        android:paddingStart="16dp"
+        android:paddingTop="28dp"
+        android:paddingEnd="16dp"
+        android:paddingBottom="20dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingStart="10dp"
+            android:paddingBottom="26dp">
+
+            <ImageView
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:contentDescription="@null"
+                android:src="@drawable/ic_launcher" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:text="@string/app_name"
+                android:textColor="@color/text"
+                android:textSize="21sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/nav_home"
+            style="@style/NavItem"
+            android:drawableStart="@drawable/ic_home"
+            android:text="Home" />
+
+        <TextView
+            android:id="@+id/nav_settings"
+            style="@style/NavItem"
+            android:drawableStart="@drawable/ic_settings"
+            android:text="Impostazioni" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+        <TextView
+            android:id="@+id/version"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingStart="14dp"
+            android:textColor="@color/text_dim"
+            android:textSize="13sp" />
+    </LinearLayout>
+
+    <FrameLayout
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1">
+
+        <ScrollView
+            android:id="@+id/home_page"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clipChildren="false"
+            android:fillViewport="true">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:clipChildren="false"
+                android:orientation="vertical"
+                android:paddingStart="44dp"
+                android:paddingTop="34dp"
+                android:paddingEnd="44dp"
+                android:paddingBottom="34dp">
+
+                <TextView
+                    android:id="@+id/greeting"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/text"
+                    android:textSize="32sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/update_banner"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:background="@drawable/banner_bg"
+                    android:clickable="true"
+                    android:drawableStart="@drawable/ic_update"
+                    android:drawablePadding="10dp"
+                    android:drawableTint="#FFFFFFFF"
+                    android:focusable="true"
+                    android:gravity="center_vertical"
+                    android:paddingStart="16dp"
+                    android:paddingTop="10dp"
+                    android:paddingEnd="18dp"
+                    android:paddingBottom="10dp"
+                    android:textColor="#FFFFFFFF"
+                    android:textSize="16sp"
+                    android:visibility="gone" />
+
+                <TextView
+                    android:id="@+id/continue_label"
+                    style="@style/SectionTitle"
+                    android:text="Continua a guardare" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/continue_list"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:clipChildren="false"
+                    android:clipToPadding="false"
+                    android:paddingTop="14dp"
+                    android:paddingBottom="8dp" />
+
+                <TextView
+                    style="@style/SectionTitle"
+                    android:text="Server" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/server_list"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:clipChildren="false"
+                    android:clipToPadding="false"
+                    android:paddingTop="14dp"
+                    android:paddingBottom="8dp" />
+            </LinearLayout>
+        </ScrollView>
+
+        <LinearLayout
+            android:id="@+id/settings_page"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:paddingStart="44dp"
+            android:paddingTop="34dp"
+            android:paddingEnd="44dp"
+            android:visibility="gone">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="18dp"
+                android:text="Impostazioni"
+                android:textColor="@color/text"
+                android:textSize="32sp"
+                android:textStyle="bold" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/settings_list"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:clipToPadding="false"
+                android:paddingBottom="24dp" />
+        </LinearLayout>
+    </FrameLayout>
+</LinearLayout>

@@ -1,9 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="bg">#FF0E1116</color>
-    <color name="text">#FFF2F4F8</color>
-    <color name="text_dim">#FF8C96A8</color>
-    <color name="accent">#FF4F8CFF</color>
-    <color name="focus">#FF243A66</color>
-    <color name="pressed">#FF2F4D86</color>
+    <!-- tema chiaro -->
+    <color name="bg">#FFFBFBFD</color>
+    <color name="sidebar">#FFF0F0F3</color>
+    <color name="surface">#FFFFFFFF</color>
+    <color name="surface2">#FFF2F2F5</color>
+    <color name="text">#FF1D1D1F</color>
+    <color name="text_dim">#FF6E6E73</color>
+    <color name="accent">#FF0A6CFF</color>
+    <color name="focus_bg">#FFEAF2FF</color>
+    <color name="divider">#FFE2E2E7</color>
+    <color name="progress_track">#FFE5E5EA</color>
+    <color name="icon_box">#FFE8F0FE</color>
+    <color name="card_border">#FFD2D2D7</color>
+    <!-- player (sempre scuro) -->
+    <color name="bar_bg">#D926262A</color>
+    <color name="panel_bg">#F026262A</color>
 </resources>

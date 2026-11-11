@@ -23,9 +23,26 @@ jobs:
 
       - name: Compila APK
         run: |
+          set -o pipefail
           chmod +x gradlew
-          ./gradlew testReleaseUnitTest assembleRelease --no-daemon --stacktrace
+          ./gradlew testReleaseUnitTest assembleRelease --no-daemon --stacktrace 2>&1 | tee build.log
           cp app/build/outputs/apk/release/app-release.apk lanterna.apk
+
+      # In caso di errore salva i log nel ramo ci-logs (leggibile senza login)
+      - name: Salva log errori
+        if: failure()
+        run: |
+          mkdir -p /tmp/logs
+          grep -nE "^e: |error:|FAILED|What went wrong|Exception|expected:|AssertionError" -A4 build.log | head -600 > /tmp/logs/errors.txt || true
+          tail -400 build.log > /tmp/logs/tail.txt || true
+          cp -r app/build/test-results /tmp/logs/ 2>/dev/null || true
+          cd /tmp/logs
+          git init -q -b ci-logs
+          git config user.name ci
+          git config user.email ci@users.noreply.github.com
+          git add -A
+          git commit -qm "log build ${{ github.run_number }}"
+          git push -qf "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}" ci-logs
 
       - uses: actions/upload-artifact@v4
         with:
