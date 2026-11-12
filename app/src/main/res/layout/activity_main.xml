@@ -69,19 +69,22 @@
     <FrameLayout
         android:layout_width="0dp"
         android:layout_height="match_parent"
-        android:layout_weight="1">
+        android:layout_weight="1"
+        android:clipChildren="false">
 
         <ScrollView
             android:id="@+id/home_page"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:clipChildren="false"
+            android:clipToPadding="false"
             android:fillViewport="true">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:clipChildren="false"
+                android:clipToPadding="false"
                 android:orientation="vertical"
                 android:paddingStart="44dp"
                 android:paddingTop="34dp"
@@ -125,10 +128,14 @@
                     android:id="@+id/continue_list"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginStart="-16dp"
+                    android:layout_marginEnd="-16dp"
                     android:clipChildren="false"
                     android:clipToPadding="false"
-                    android:paddingTop="14dp"
-                    android:paddingBottom="8dp" />
+                    android:paddingStart="16dp"
+                    android:paddingTop="18dp"
+                    android:paddingEnd="16dp"
+                    android:paddingBottom="18dp" />
 
                 <TextView
                     style="@style/SectionTitle"
@@ -138,10 +145,14 @@
                     android:id="@+id/server_list"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginStart="-16dp"
+                    android:layout_marginEnd="-16dp"
                     android:clipChildren="false"
                     android:clipToPadding="false"
-                    android:paddingTop="14dp"
-                    android:paddingBottom="8dp" />
+                    android:paddingStart="16dp"
+                    android:paddingTop="18dp"
+                    android:paddingEnd="16dp"
+                    android:paddingBottom="18dp" />
             </LinearLayout>
         </ScrollView>
 

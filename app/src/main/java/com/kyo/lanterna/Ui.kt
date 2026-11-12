@@ -40,6 +40,8 @@ object TvScale {
 
 private fun View.focusScale(scale: Float) {
     setOnFocusChangeListener { v, f ->
+        // il riquadro selezionato va sopra i vicini, così non viene coperto
+        v.translationZ = if (f) 8f * v.resources.displayMetrics.density else 0f
         v.animate().scaleX(if (f) scale else 1f).scaleY(if (f) scale else 1f).setDuration(120).start()
     }
 }
@@ -154,7 +156,7 @@ class CardAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VH {
         val v = LayoutInflater.from(parent.context).inflate(R.layout.item_card, parent, false)
-        v.focusScale(1.06f)
+        v.focusScale(1.05f)
         return VH(v)
     }
 
