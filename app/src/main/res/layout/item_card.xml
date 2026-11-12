@@ -1,23 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="250dp"
+    android:layout_width="196dp"
     android:layout_height="wrap_content"
-    android:layout_marginEnd="20dp"
+    android:layout_marginEnd="16dp"
     android:background="@drawable/card_bg"
     android:clickable="true"
     android:focusable="true"
     android:orientation="vertical"
-    android:padding="8dp">
+    android:padding="6dp">
 
     <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="132dp"
+        android:layout_height="103dp"
         android:background="@drawable/thumb_bg">
 
         <ImageView
             android:id="@+id/icon"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
             android:layout_gravity="center"
             android:contentDescription="@null"
             android:tint="@color/text_dim" />
@@ -30,7 +30,7 @@
             android:layout_gravity="bottom"
             android:layout_marginStart="12dp"
             android:layout_marginEnd="12dp"
-            android:layout_marginBottom="10dp"
+            android:layout_marginBottom="8dp"
             android:max="100"
             android:progressDrawable="@drawable/progress_bar"
             android:visibility="gone" />
@@ -41,11 +41,11 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="4dp"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="7dp"
         android:ellipsize="end"
         android:maxLines="1"
         android:textColor="@color/text"
-        android:textSize="16sp"
+        android:textSize="15sp"
         android:textStyle="bold" />
 
     <TextView
@@ -53,9 +53,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="4dp"
-        android:layout_marginBottom="4dp"
+        android:layout_marginBottom="2dp"
         android:ellipsize="end"
         android:maxLines="1"
         android:textColor="@color/text_dim"
-        android:textSize="13sp" />
+        android:textSize="12sp" />
 </LinearLayout>

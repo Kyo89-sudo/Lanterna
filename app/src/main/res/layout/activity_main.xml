@@ -133,9 +133,9 @@
                     android:clipChildren="false"
                     android:clipToPadding="false"
                     android:paddingStart="16dp"
-                    android:paddingTop="18dp"
+                    android:paddingTop="14dp"
                     android:paddingEnd="16dp"
-                    android:paddingBottom="18dp" />
+                    android:paddingBottom="14dp" />
 
                 <TextView
                     style="@style/SectionTitle"
@@ -150,9 +150,9 @@
                     android:clipChildren="false"
                     android:clipToPadding="false"
                     android:paddingStart="16dp"
-                    android:paddingTop="18dp"
+                    android:paddingTop="14dp"
                     android:paddingEnd="16dp"
-                    android:paddingBottom="18dp" />
+                    android:paddingBottom="14dp" />
             </LinearLayout>
         </ScrollView>
 
